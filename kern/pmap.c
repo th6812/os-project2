@@ -376,8 +376,30 @@ page_decref(struct PageInfo* pp)
 pte_t *
 pgdir_walk(pde_t *pgdir, const void *va, int create)
 {
-	// Fill this function in
-	return NULL;
+	pde_t *pde;
+	pde_t *pt;
+	struct PageInfo *pp;
+
+	// page directory macro in inc/mmu.h
+	pde = &pgdir[PDX(va)];
+	if (*pde & PTE_P) {
+		// get page table address
+		pt = (pte_t *)KADDR(PTE_ADDR(*pde));
+	} else {
+		if (!create) {
+			return NULL;
+		}
+	}
+
+	pp = page_alloc(ALLOC_ZERO);
+	if (pp == NULL) {
+		return NULL;
+	}
+	pp->pp_ref++;
+
+	*pde = page2pa(pp) | PTE_P | PTE_W | PTE_U;
+	pt = (pte_t *)page2kva(pp);
+	return &pt[PTX(va)];
 }
 
 //
