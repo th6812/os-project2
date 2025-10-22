@@ -389,16 +389,16 @@ pgdir_walk(pde_t *pgdir, const void *va, int create)
 		if (!create) {
 			return NULL;
 		}
-	}
 
-	pp = page_alloc(ALLOC_ZERO);
-	if (pp == NULL) {
-		return NULL;
-	}
-	pp->pp_ref++;
+		pp = page_alloc(ALLOC_ZERO);
+		if (pp == NULL) {
+			return NULL;
+		}
+		pp->pp_ref++;
 
-	*pde = page2pa(pp) | PTE_P | PTE_W | PTE_U;
-	pt = (pte_t *)page2kva(pp);
+		*pde = page2pa(pp) | PTE_P | PTE_W | PTE_U;
+		pt = (pte_t *)page2kva(pp);
+	}
 	return &pt[PTX(va)];
 }
 
